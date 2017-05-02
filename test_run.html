@@ -1,0 +1,273 @@
+<html>
+<head>
+		<title>Test page</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, maximum-scale=1.0">
+		<meta name="theme-color" content="#ffffff">
+		<script src="jquery.min.js"></script>
+		<script src="papaparse.js"></script>
+		<script src="underscore.js"></script>
+</head>
+<script>
+  var dragged;
+/* events fired on the draggable target */
+  document.addEventListener("drag", function( event ) {
+
+  }, false);
+
+  document.addEventListener("dragstart", function( event ) {
+      // store a ref. on the dragged elem
+      dragged = event.target;
+      // make it half transparent
+      event.target.style.opacity = .5;
+  }, false);
+
+  document.addEventListener("dragend", function( event ) {
+      // reset the transparency
+      event.target.style.opacity = "";
+  }, false);
+
+  /* events fired on the drop targets */
+  document.addEventListener("dragover", function( event ) {
+      // prevent default to allow drop
+      event.preventDefault();
+  }, false);
+
+  document.addEventListener("dragenter", function( event ) {
+      // highlight potential drop target when the draggable element enters it
+      if ( event.target.className == "dropzone" ) {
+          event.target.style.background = "purple";
+      }
+
+  }, false);
+
+  document.addEventListener("dragleave", function( event ) {
+      // reset background of potential drop target when the draggable element leaves it
+      if ( event.target.className == "dropzone" ) {
+          event.target.style.background = "";
+      }
+
+  }, false);
+
+  document.addEventListener("drop", function( event ) {
+      // prevent default action (open as link for some elements)
+      event.preventDefault();
+      // move dragged elem to the selected drop target
+      if ( event.target.className == "dropzone" ) {
+          event.target.style.background = "";
+          //dragged.parentNode.removeChild( dragged );
+          event.target.appendChild( dragged );
+      }
+    
+  }, false);
+
+
+</script>
+<style>
+.root {
+   float: left;
+   margin: 10px;
+   padding: 10px;
+   max-width: 300px;
+   height: 300px;
+   border: 1px solid black;
+}
+.filter_container{
+   float: left;
+   margin: 10px;
+   padding: 10px;
+   max-width: 300px;
+   height: 260px;
+   //border: 1px solid black;
+}
+.filter_list{
+   float: left;
+   margin: 10px;
+   padding: 10px;
+   max-width: 300px;
+   height: 220px;
+   overflow: auto;
+   //border: 1px solid black;
+}
+.dropzone{
+ float: left;
+   margin: 10px;
+   padding: 10px;
+   max-width: 300px;
+   height: 220px;
+   overflow: auto;
+   //border: 1px solid black;
+
+}
+</style>
+<body>
+	<h1>Event Viewer</h1>
+	<h2>Drag and drop into band, stack and panel!</h2>
+	<input type="file" id='files' accept=".csv"></input>
+	<button id="submit">Parse</button>
+
+	<div id="root_event" class="root">
+		<div class ="filter_container">
+    		<ul id="event" class ="dropzone">
+        	</ul>
+    	</div>
+	</div>
+	<div id="root_location" class="root">
+		<div class ="filter_container">
+    		<ul id="location" class ="dropzone">
+	        </ul>
+		</div>
+	</div>
+	<div id="root_time" class="root">
+		<div class ="filter_container">
+	    	<ul id="time" class ="dropzone">
+	        </ul>
+	    </div>
+	</div>
+	<div id="drop_event" class="root" >    
+		<div class ="filter_container">
+	    	<ul id="event_band" class ="dropzone">
+	        </ul>
+	    </div>
+	</div>
+	<div id="drop_location" class="root">
+		<div class ="filter_container">
+	    	<ul id="location_band" class ="dropzone">
+	        </ul>
+	    </div>
+  	</div>
+	<div id="drop_time" class="root" >
+		<div class ="filter_container">
+	    	<ul id="time_band" class ="dropzone">
+	        </ul>
+	    </div>
+
+	</div>
+</body>
+</html>
+<script>
+//var loca = [];
+// Demo invoked
+	//var loca = [];
+	$('#submit').click(function(){
+
+		var config = {
+		delimiter: ',',
+		header: true,
+		dynamicTyping:false,
+		skipEmptyLines: false,
+		preview:0,
+		step: undefined,
+		encoding: "",
+		worker: false,
+		comments: false,
+		complete: completeFn,
+		error: errorFn
+	};
+		if (!$('#files')[0].files.length)
+		{
+			alert("Please choose at least one file to parse.");
+			return enableButton();
+		}			
+		$('#files').parse({
+			config: config,
+			before: function(file, inputElem)
+			{
+				start = now();
+				console.log("Parsing file...", file);
+				$("#status").html("processing...")
+			},
+			error: function(err, file)
+			{
+				console.log("ERROR:", err, file);
+
+			},
+			complete: function()
+			{	
+				$("#status").html("")
+				end = now();
+				console.log("Done with all files");
+			}
+		})
+
+	});		
+function now()
+{
+	// Just returns the current time
+	return typeof window.performance !== 'undefined'
+			? window.performance.now()
+			: 0;
+}
+function completeFn(results)
+{
+	//get_data_atrribues(results)
+	end = now();
+	console.log("results: ", results);
+	data = results['data'];
+	//Array to hold location,time and event data.
+	var location_array = [];
+	var time_array =[];
+	var event_array=[];
+	//Extracting data and pushing into location, time and event array.
+	for (i in data)
+	{
+		output_1 = data[i]['location'];
+		location_array.push(output_1);
+		console.log(location_array);
+		output_2 = data[i]['start_date'];
+		output_3 = data[i]['end_date'];
+		
+		output_2= output_2.slice(0,4);
+		console.log(output_2);
+		output_3= output_3.slice(0,4);
+		console.log(output_3);
+		time_array.push(output_2);
+		time_array.push(output_3);
+		output_4= data[i]['event_name'];
+		event_array.push(output_4);
+	}
+	location_array =_.unique(location_array);
+	time_array = _.unique(time_array);
+	event_array = _.unique(event_array);
+	console.log("the location_array contains the following unique values :", location_array);
+	console.log("the time_array contains the following unique values :", time_array);
+	console.log("the event_array contains the following unique values :", event_array);
+	for (j in event_array){
+		var node = document.createElement("LI");
+		node.draggable=true;
+		node.setAttribute("id",event_array[j]);
+    	var textnode = document.createTextNode(event_array[j]);
+		node.appendChild(textnode);
+    	document.getElementById("event").appendChild(node);
+	}
+	for (j in location_array){
+		var node = document.createElement("LI");
+		node.draggable=true;
+		node.setAttribute("id", location_array[j]);
+    	var textnode = document.createTextNode(location_array[j]);
+		node.appendChild(textnode);
+    	document.getElementById("location").appendChild(node);
+	}
+	for (j in time_array){
+		var node = document.createElement("LI");
+		node.draggable=true;
+		node.setAttribute("id",time_array[j]);
+    	var textnode = document.createTextNode(time_array[j]);
+		node.appendChild(textnode);
+    	document.getElementById("time").appendChild(node);
+	}
+}
+// This gets the unique events, location
+// and year form the data 
+// @param results An array representing the passed in array
+function get_data_atrribues(results)
+{
+	console.log(results)
+}
+function errorFn(err, file)
+{
+	end = now();
+	console.log("ERROR:", err, file);
+	enableButton();
+}
+</script>

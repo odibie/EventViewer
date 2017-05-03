@@ -1,0 +1,9 @@
+start_date,end_date,location,lat,lon ,event_name,event_value,event_description
+2012/05/22,2012/05/22,Orono,44.8831,-68.6719,rainfall,2.5,rainfall> 2 inches
+2013/05/22,2013/05/22,Orono,44.8831,-68.6719,col_score,33,fecal coliform > 31
+2017/05/22,2017/05/22,Orono,44.8831,-68.6719,rainfall,2.5,rainfall> 2 inches
+2018/05/22,2018/05/22,Bangor,44.8831,-68.6719,col_score,33,fecal coliform > 31
+2019/05/22,2019/05/22,Old Town,44.8831,-68.6719,rainfall,2.5,rainfall> 2 inches
+2020/05/22,2020/05/22,Portland,44.8831,-68.6719,col_score,33,fecal coliform > 31
+2030/05/22,2030/05/22,Bath,44.8831,-68.6719,extra test event,2.5,test event
+2040/05/23,2041/05/23,Lasgidi,44.8831,-68.6719,extra test event,33,test event

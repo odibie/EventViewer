@@ -1,0 +1,329 @@
+<html>
+<head>
+		<title>Test page</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, maximum-scale=1.0">
+		<meta name="theme-color" content="#ffffff">
+		
+
+		<script src="papaparse.js"></script>
+		<script src="underscore.js"></script>
+		
+		<link rel="stylesheet" type="text/css" href="bootstrap/bootstrap.css" charset="utf-8" />
+        <link rel="stylesheet" type="text/css" href="bootstrap/bootstrap-theme.css" charset="utf-8" />
+        <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="style/theme.css" charset="utf-8" />
+		<link rel="stylesheet" type="text/css" href="style/RV.css" charset="utf-8" />
+		
+		<link rel="stylesheet" type="text/css" href="style/loading.css" charset="utf-8" />
+		
+		<link rel="stylesheet" type="text/css" href="style/reset.css" charset="utf-8" />
+		
+		<link rel="stylesheet" type="text/css" href="temp/style.css" charset="utf-8" />
+		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+        
+        
+		
+		<!--<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>-->
+
+		</head>
+<script>
+  var dragged;
+/* events fired on the draggable target */
+  document.addEventListener("drag", function( event ) {
+
+  }, false);
+
+  document.addEventListener("dragstart", function( event ) {
+      // store a ref. on the dragged elem
+      dragged = event.target;
+      // make it half transparent
+      event.target.style.opacity = .5;
+  }, false);
+
+  document.addEventListener("dragend", function( event ) {
+      // reset the transparency
+      event.target.style.opacity = "";
+  }, false);
+
+  /* events fired on the drop targets */
+  document.addEventListener("dragover", function( event ) {
+      // prevent default to allow drop
+      event.preventDefault();
+  }, false);
+
+  document.addEventListener("dragenter", function( event ) {
+      // highlight potential drop target when the draggable element enters it
+      if ( event.target.className == "dropzone" ) {
+          event.target.style.background = "purple";
+      }
+
+  }, false);
+
+  document.addEventListener("dragleave", function( event ) {
+      // reset background of potential drop target when the draggable element leaves it
+      if ( event.target.className == "dropzone" ) {
+          event.target.style.background = "";
+      }
+
+  }, false);
+
+  document.addEventListener("drop", function( event ) {
+      // prevent default action (open as link for some elements)
+      event.preventDefault();
+      // move dragged elem to the selected drop target
+      if ( event.target.className == "dropzone" ) {
+          event.target.style.background = "";
+          //dragged.parentNode.removeChild( dragged );
+          event.target.appendChild( dragged );
+      }
+    
+  }, false);
+
+
+</script>
+<style>
+.buckets {
+   float: left;
+   margin: 10px;
+   padding: 10px;
+   max-width: 300px;
+   height: 300px;
+   border: 1px solid black;
+}
+.fiter_new_1{
+   float: left;
+   margin: 10px;
+   padding: 10px;
+   max-width: 300px;
+   height: 260px;
+   //border: 1px solid black;
+}
+.filter_list{
+   float: left;
+   margin: 10px;
+   padding: 10px;
+   max-width: 300px;
+   height: 220px;
+   overflow: auto;
+   //border: 1px solid black;
+}
+.dropzone{
+ float: left;
+   margin: 10px;
+   padding: 10px;
+   max-width: 300px;
+   height: 220px;
+   overflow: auto;
+   //border: 1px solid black;
+
+}
+#results_container {
+	color: white;
+}
+</style>
+<body>
+	<h1>Event Viewer</h1>
+	<h2>Drag and drop into band, stack and panel!</h2>
+	<input type="file" id='files' accept=".csv"></input>
+	<button id="submit">Parse</button>
+	<button id="query">QUERY</button>
+	<div id="root_event" class="buckets">
+		<div class ="fiter_new_1">
+    		<ul id="event" class ="dropzone">
+        	</ul>
+    	</div>
+	</div>
+	<div id="root_location" class = "buckets">
+		<div class ="fiter_new_1">
+    		<ul id="location" class ="dropzone">
+	        </ul>
+		</div>
+	</div>
+	<div id="root_time" class = "buckets">
+		<div class ="fiter_new_1">
+	    	<ul id="time" class ="dropzone">
+	        </ul>
+	    </div>
+	</div>
+	<div id="drop_event" class ="buckets">    
+		<div class ="fiter_new_1">
+	    	<ul id="event_band" class ="dropzone">
+	        </ul>
+	    </div>
+	</div>
+	<div id="drop_location" class="buckets">
+		<div class ="fiter_new_1">
+	    	<ul id="location_band" class ="dropzone">
+	        </ul>
+	    </div>
+  	</div>
+	<div id="drop_time" class="buckets" >
+		<div class ="fiter_new_1">
+	    	<ul id="time_band" class ="dropzone">
+	        </ul>
+	    </div>
+<!--<link rel="stylesheet" type="text/css" href="style/RV.css" charset="utf-8" />-->
+
+	</div>
+
+	<div id="results_container" style="display:none"></div>
+
+
+</body>
+</html>
+<script>
+//var loca = [];
+// Demo invoked
+	//var loca = [];
+	$('#submit').click(function(){
+
+		var config = {
+		delimiter: ',',
+		header: true,
+		dynamicTyping:false,
+		skipEmptyLines: false,
+		preview:0,
+		step: undefined,
+		encoding: "",
+		worker: false,
+		comments: false,
+		complete: completeFn,
+		error: errorFn
+	};
+		if (!$('#files')[0].files.length)
+		{
+			alert("Please choose at least one file to parse.");
+			return enableButton();
+		}			
+		$('#files').parse({
+			config: config,
+			before: function(file, inputElem)
+			{
+				start = now();
+				console.log("Parsing file...", file);
+				$("#status").html("processing...")
+			},
+			error: function(err, file)
+			{
+				console.log("ERROR:", err, file);
+
+			},
+			complete: function()
+			{	
+				$("#status").html("")
+				end = now();
+				console.log("Done with all files");
+			}
+		})
+
+	});		
+function now()
+{
+	// Just returns the current time
+	return typeof window.performance !== 'undefined'
+			? window.performance.now()
+			: 0;
+}
+function completeFn(results)
+{
+	//get_data_atrribues(results)
+	end = now();
+	console.log("results: ", results);
+	data = results['data'];
+	//Array to hold location,time and event data.
+	var location_array = [];
+	var time_array =[];
+	var event_array=[];
+	//Extracting data and pushing into location, time and event array.
+	for (i in data)
+	{
+		output_1 = data[i]['location'];
+		location_array.push(output_1);
+		console.log(location_array);
+		output_2 = data[i]['start_date'];
+		output_3 = data[i]['end_date'];
+		
+		output_2= output_2.slice(0,4);
+		console.log(output_2);
+		output_3= output_3.slice(0,4);
+		console.log(output_3);
+		time_array.push(output_2);
+		time_array.push(output_3);
+		output_4= data[i]['event_name'];
+		event_array.push(output_4);
+	}
+	location_array =_.unique(location_array);
+	time_array = _.unique(time_array);
+	event_array = _.unique(event_array);
+	console.log("the location_array contains the following unique values :", location_array);
+	console.log("the time_array contains the following unique values :", time_array);
+	console.log("the event_array contains the following unique values :", event_array);
+	for (j in event_array){
+		var node = document.createElement("LI");
+		node.draggable=true;
+		node.setAttribute("id",event_array[j]);
+    	var textnode = document.createTextNode(event_array[j]);
+		node.appendChild(textnode);
+    	document.getElementById("event").appendChild(node);
+	}
+	for (j in location_array){
+		var node = document.createElement("LI");
+		node.draggable=true;
+		node.setAttribute("id", location_array[j]);
+    	var textnode = document.createTextNode(location_array[j]);
+		node.appendChild(textnode);
+    	document.getElementById("location").appendChild(node);
+	}
+	for (j in time_array){
+		var node = document.createElement("LI");
+		node.draggable=true;
+		node.setAttribute("id",time_array[j]);
+    	var textnode = document.createTextNode(time_array[j]);
+		node.appendChild(textnode);
+    	document.getElementById("time").appendChild(node);
+	}
+}
+// This gets the unique events, location
+// and year form the data 
+// @param results An array representing the passed in array
+function get_data_atrribues(results)
+{
+	console.log(results)
+}
+function errorFn(err, file)
+{
+	end = now();
+	console.log("ERROR:", err, file);
+	enableButton();
+}
+$("#query").click(function(){
+	console.log("I just clicked on the query button");
+		 	
+			$("#results_container").children(":not(#tb_container)").remove();
+			
+			//result_data =[{"[Gulf of Maine].[Coastal].[Western Maine Shelf].[B].[1-20]":{"[TimeFilter].[2001]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2001-10-09 07:55:12.0","2001-10-11 07:55:12.0","0.376"],["2001-11-03 19:55:12.0","2001-11-04 03:07:12.0","0.008"],["2001-11-06 06:00:00.0","2001-11-25 09:07:12.0","0.542"],["2001-11-29 11:02:24.0","2001-12-14 18:57:36.0","0.348"],["2001-12-14 19:55:12.0","2001-12-18 04:04:48.0","-9999.0"],["2001-12-18 05:02:24.0","2001-12-24 21:07:12.0","0.419"],["2001-12-25 10:04:48.0","2002-01-22 07:55:12.0","0.352"]]}}},{"[Gulf of Maine].[Coastal].[Western Maine Shelf].[B].[1-20]":{"[TimeFilter].[2002]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2002-01-22 13:55:12.0","2002-02-17 00:57:36.0","0.262"],["2002-02-17 11:02:24.0","2002-02-22 01:55:12.0","0.193"],["2002-02-22 12:57:36.0","2002-03-14 18:57:36.0","0.195"],["2002-03-15 23:02:24.0","2002-03-23 04:04:48.0","0.213"],["2002-03-24 06:00:00.0","2002-03-26 01:55:12.0","0.167"],["2002-03-26 15:07:12.0","2002-03-27 15:07:12.0","0.132"],["2002-03-27 16:04:48.0","2002-06-17 12:00:00.0","-9999.0"],["2002-10-01 17:02:24.0","2002-10-08 21:07:12.0","-9999.0"],["2002-10-15 21:07:12.0","2003-03-23 17:02:24.0","0.802"]]}}},{"[Gulf of Maine].[Coastal].[Western Maine Shelf].[B].[1-20]":{"[TimeFilter].[2003]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2003-03-31 18:57:36.0","2003-04-01 11:02:24.0","0.414"],["2003-04-13 00:57:36.0","2003-04-13 18:57:36.0","0.303"],["2003-04-14 23:02:24.0","2003-04-15 06:57:36.0","0.228"],["2003-04-18 05:02:24.0","2003-04-18 11:02:24.0","0.131"],["2003-04-28 00:00:00.0","2003-04-28 17:02:24.0","0.893"],["2003-05-17 00:00:00.0","2003-05-18 10:04:48.0","0.515"],["2003-05-25 09:07:12.0","2003-05-26 01:55:12.0","0.464"],["2003-10-25 06:57:36.0","2003-10-25 21:07:12.0","0.086"],["2003-11-15 00:00:00.0","2003-11-16 19:55:12.0","0.481"],["2003-11-21 21:07:12.0","2003-11-22 05:02:24.0","0.101"],["2003-11-26 06:57:36.0","2003-11-27 12:57:36.0","0.337"],["2003-11-29 23:02:24.0","2003-12-01 18:00:00.0","0.323"],["2003-12-02 01:55:12.0","2003-12-24 15:07:12.0","0.417"],["2003-12-26 18:00:00.0","2003-12-28 19:55:12.0","0.264"],["2003-12-29 04:04:48.0","2004-01-04 13:55:12.0","0.253"]]}}},{"[Gulf of Maine].[Coastal].[Western Maine Shelf].[B].[1-20]":{"[TimeFilter].[2004]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2004-01-05 10:04:48.0","2004-01-07 18:57:36.0","0.345"],["2004-01-08 18:00:00.0","2004-02-28 23:02:24.0","0.425"],["2004-02-29 13:55:12.0","2004-03-01 04:04:48.0","0.058"],["2004-03-09 03:07:12.0","2004-03-10 12:00:00.0","0.324"],["2004-03-12 00:00:00.0","2004-03-12 18:57:36.0","0.229"],["2004-03-14 04:04:48.0","2004-03-15 15:07:12.0","0.105"],["2004-03-17 06:57:36.0","2004-03-21 19:55:12.0","0.195"],["2004-03-22 18:00:00.0","2004-03-24 18:00:00.0","0.087"],["2004-04-02 04:04:48.0","2004-04-05 03:07:12.0","0.289"],["2004-04-13 19:55:12.0","2004-04-14 09:07:12.0","0.073"],["2004-04-16 10:04:48.0","2004-04-16 19:55:12.0","0.092"],["2004-10-13 01:55:12.0","2004-10-13 13:55:12.0","0.309"],["2004-10-23 00:57:36.0","2004-10-27 12:00:00.0","0.447"],["2004-10-30 04:04:48.0","2004-10-30 18:57:36.0","0.472"],["2004-11-04 07:55:12.0","2004-12-12 06:00:00.0","0.584"],["2004-12-18 05:02:24.0","2005-01-05 11:02:24.0","0.629"]]}}},{"[Gulf of Maine].[Coastal].[Western Maine Shelf].[B].[1-20]":{"[Time].[Month].\u0026[April]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[]}}}]
+			result_data=[{"Gulf of Maine":{"[TimeFilter].[2001]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2001-10-09 07:55:12.0","2001-10-11 07:55:12.0","0.376"],["2001-11-03 19:55:12.0","2001-11-04 03:07:12.0","0.008"],["2001-11-06 06:00:00.0","2001-11-25 09:07:12.0","0.542"],["2001-11-29 11:02:24.0","2001-12-14 18:57:36.0","0.348"],["2001-12-14 19:55:12.0","2001-12-18 04:04:48.0","-9999.0"],["2001-12-18 05:02:24.0","2001-12-24 21:07:12.0","0.419"],["2001-12-25 10:04:48.0","2002-01-22 07:55:12.0","0.352"]]}}},{"Gulf of Maine":{"[TimeFilter].[2002]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2002-01-22 13:55:12.0","2002-02-17 00:57:36.0","0.262"],["2002-02-17 11:02:24.0","2002-02-22 01:55:12.0","0.193"],["2002-02-22 12:57:36.0","2002-03-14 18:57:36.0","0.195"],["2002-03-15 23:02:24.0","2002-03-23 04:04:48.0","0.213"],["2002-03-24 06:00:00.0","2002-03-26 01:55:12.0","0.167"],["2002-03-26 15:07:12.0","2002-03-27 15:07:12.0","0.132"],["2002-03-27 16:04:48.0","2002-06-17 12:00:00.0","-9999.0"],["2002-10-01 17:02:24.0","2002-10-08 21:07:12.0","-9999.0"],["2002-10-15 21:07:12.0","2003-03-23 17:02:24.0","0.802"]]}}},{"Gulf of Maine":{"[TimeFilter].[2003]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2003-03-31 18:57:36.0","2003-04-01 11:02:24.0","0.414"],["2003-04-13 00:57:36.0","2003-04-13 18:57:36.0","0.303"],["2003-04-14 23:02:24.0","2003-04-15 06:57:36.0","0.228"],["2003-04-18 05:02:24.0","2003-04-18 11:02:24.0","0.131"],["2003-04-28 00:00:00.0","2003-04-28 17:02:24.0","0.893"],["2003-05-17 00:00:00.0","2003-05-18 10:04:48.0","0.515"],["2003-05-25 09:07:12.0","2003-05-26 01:55:12.0","0.464"],["2003-10-25 06:57:36.0","2003-10-25 21:07:12.0","0.086"],["2003-11-15 00:00:00.0","2003-11-16 19:55:12.0","0.481"],["2003-11-21 21:07:12.0","2003-11-22 05:02:24.0","0.101"],["2003-11-26 06:57:36.0","2003-11-27 12:57:36.0","0.337"],["2003-11-29 23:02:24.0","2003-12-01 18:00:00.0","0.323"],["2003-12-02 01:55:12.0","2003-12-24 15:07:12.0","0.417"],["2003-12-26 18:00:00.0","2003-12-28 19:55:12.0","0.264"],["2003-12-29 04:04:48.0","2004-01-04 13:55:12.0","0.253"]]}}},{"Gulf of Maine":{"[TimeFilter].[2004]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2004-01-05 10:04:48.0","2004-01-07 18:57:36.0","0.345"],["2004-01-08 18:00:00.0","2004-02-28 23:02:24.0","0.425"],["2004-02-29 13:55:12.0","2004-03-01 04:04:48.0","0.058"],["2004-03-09 03:07:12.0","2004-03-10 12:00:00.0","0.324"],["2004-03-12 00:00:00.0","2004-03-12 18:57:36.0","0.229"],["2004-03-14 04:04:48.0","2004-03-15 15:07:12.0","0.105"],["2004-03-17 06:57:36.0","2004-03-21 19:55:12.0","0.195"],["2004-03-22 18:00:00.0","2004-03-24 18:00:00.0","0.087"],["2004-04-02 04:04:48.0","2004-04-05 03:07:12.0","0.289"],["2004-04-13 19:55:12.0","2004-04-14 09:07:12.0","0.073"],["2004-04-16 10:04:48.0","2004-04-16 19:55:12.0","0.092"],["2004-10-13 01:55:12.0","2004-10-13 13:55:12.0","0.309"],["2004-10-23 00:57:36.0","2004-10-27 12:00:00.0","0.447"],["2004-10-30 04:04:48.0","2004-10-30 18:57:36.0","0.472"],["2004-11-04 07:55:12.0","2004-12-12 06:00:00.0","0.584"],["2004-12-18 05:02:24.0","2005-01-05 11:02:24.0","0.629"]]}}},{"Gulf of Maine":{"[Time].[Month].\u0026[April]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[]}}}]
+			r = new ResultsBuilder(result_data)
+					r.build()
+	
+			
+			//$("#query_container").animate({width: 'toggle'})
+			$("#results_container").animate({width: 'toggle', left: '100%'})
+
+			$("#results_container").show()	
+			//$("#continue").detach().appendTo('#tb_container')
+			//$("#continue").slideDown();
+	
+			//var r = new ResultsBuilder(sample);
+			//r.build()
+})
+</script>
+<script src="script/bootstrap.min.js"></script>
+	    <script src="script/bootstrap.js"></script>
+		<script src="script/d3.v3.js"></script>
+        <script src="script/RV_Classes.js"></script>
+        <script src="script/RVtimebar.js"></script>
+        <script src="script/RV.js"></script>

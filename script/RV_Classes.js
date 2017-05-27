@@ -688,14 +688,14 @@ function prepareToolBar () {
 	$('#toolbarBG').remove();
 	
 	$('#results_container').prepend('<div id="toolbar_container">');
-	$('#results_container').prepend('<div id="toolbarBG">');
+	//$('#results_container').prepend('<div id="toolbarBG">');
 	var tb = $('#toolbar_container');
 	var tbg = $('#toolbarBG');
 
 	//tb.append('<button id="toolbar_button">Tool Bar<span><img style="margin-left:5px;" src="images/ddArrow1.png"></span></button>')
 	//tb.append('<ul id="tool-list">')
 	//var list = $('#tool-list')
-	tb.append('<span><button class="tbButton toolBarButton" id="backto">Back To Builder</button></span>')
+	//tb.append('<span><button class="tbButton toolBarButton" id="backto">Back To Builder</button></span>')
 	tb.append('<span><button class="tbButton toolBarButton" id="TBtoggle">Toggle Time Bar</button></span>')
 
 	$('#toolbar_button').click(function(event) {

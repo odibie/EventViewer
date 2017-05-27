@@ -1,96 +1,37 @@
 <html>
+
 <head>
 		<title>Test page</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, maximum-scale=1.0">
 		<meta name="theme-color" content="#ffffff">
-		
-
-		<script src="papaparse.js"></script>
-		<script src="underscore.js"></script>
-		
-		<link rel="stylesheet" type="text/css" href="bootstrap/bootstrap.css" charset="utf-8" />
-        <link rel="stylesheet" type="text/css" href="bootstrap/bootstrap-theme.css" charset="utf-8" />
-        <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="style/theme.css" charset="utf-8" />
-		<link rel="stylesheet" type="text/css" href="style/RV.css" charset="utf-8" />
-		
-		<link rel="stylesheet" type="text/css" href="style/loading.css" charset="utf-8" />
-		
-		<link rel="stylesheet" type="text/css" href="style/reset.css" charset="utf-8" />
-		
-		<link rel="stylesheet" type="text/css" href="temp/style.css" charset="utf-8" />
-		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-        
-        
-		
-		<!--<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>-->
+		<script src="papaparse.js"></script>
+		<script src="underscore.js"></script>
+		<link rel="stylesheet" type="text/css" href="style/RV.css" charset="utf-8" />
+</head>
 
-		</head>
+
 <script>
-  var dragged;
-/* events fired on the draggable target */
-  document.addEventListener("drag", function( event ) {
-
-  }, false);
-
-  document.addEventListener("dragstart", function( event ) {
-      // store a ref. on the dragged elem
-      dragged = event.target;
-      // make it half transparent
-      event.target.style.opacity = .5;
-  }, false);
-
-  document.addEventListener("dragend", function( event ) {
-      // reset the transparency
-      event.target.style.opacity = "";
-  }, false);
-
-  /* events fired on the drop targets */
-  document.addEventListener("dragover", function( event ) {
-      // prevent default to allow drop
-      event.preventDefault();
-  }, false);
-
-  document.addEventListener("dragenter", function( event ) {
-      // highlight potential drop target when the draggable element enters it
-      if ( event.target.className == "dropzone" ) {
-          event.target.style.background = "purple";
-      }
-
-  }, false);
-
-  document.addEventListener("dragleave", function( event ) {
-      // reset background of potential drop target when the draggable element leaves it
-      if ( event.target.className == "dropzone" ) {
-          event.target.style.background = "";
-      }
-
-  }, false);
-
-  document.addEventListener("drop", function( event ) {
-      // prevent default action (open as link for some elements)
-      event.preventDefault();
-      // move dragged elem to the selected drop target
-      if ( event.target.className == "dropzone" ) {
-          event.target.style.background = "";
-          //dragged.parentNode.removeChild( dragged );
-          event.target.appendChild( dragged );
-      }
-    
-  }, false);
-
-
+var map_locations = []
+var labels=[]
+  // $( function() {
+  //   $( "#event" ).selectable();
+  //   $( "#time" ).selectable();
+  //   $( "#location" ).selectable();
+  // } );
 </script>
+
+
 <style>
+/* Style for the Event_Viewer */
 .buckets {
    float: left;
    margin: 10px;
    padding: 10px;
    max-width: 300px;
-   height: 300px;
+   height: 260px;
    border: 1px solid black;
 }
 .fiter_new_1{
@@ -98,7 +39,7 @@
    margin: 10px;
    padding: 10px;
    max-width: 300px;
-   height: 260px;
+   height: 160px;
    //border: 1px solid black;
 }
 .filter_list{
@@ -108,6 +49,7 @@
    max-width: 300px;
    height: 220px;
    overflow: auto;
+   background: #DCDCDC;
    //border: 1px solid black;
 }
 .dropzone{
@@ -115,71 +57,291 @@
    margin: 10px;
    padding: 10px;
    max-width: 300px;
-   height: 220px;
+   height: 140px;
    overflow: auto;
+   background: #DCDCDC;
    //border: 1px solid black;
-
 }
 #results_container {
 	color: white;
 }
+/* The Modal (background) */
+.modal {
+    height: 400px;
+    width: 100%;
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+/* Modal Content */
+.modal-content { 
+    margin: auto;
+    width: 80%;
+}
+#map {
+	height: 450px;
+	width: 100%;
+     }
+/* The Close Button */
+.close {
+	color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.close:hover,
+.close:focus {
+	color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+#processing{
+	padding-top: 10px;
+	font-size: 10px;
+}
+.tabs{
+    float: left;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.tabs ul {
+    list-style: none;
+}
+
+.tabs
+ ul li {
+  display:inline-block;
+}
+
+.w3-teal, .w3-hover-teal:hover {
+    color: #fff!important;
+    background-color: #304266!important;
+    padding: 0.01em 16px;
+
+
+}
+.first_step{
+	background-color: white; /* Green */
+    border: none;
+    color: black;
+    padding: 0px 20px;
+    padding-bottom: 50px;
+    /*text-align: center;*/
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18px;
+    margin-left: 20px;
+}
+.submits{
+	background: #304266; /* Green */
+    border: white;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 13px;
+    margin-top: 0px;
+}
+.query{
+	background: #304266; /* Green */
+    border: white;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18px;
+    margin-left: 10px;
+    margin-top: 60px;
+}
+#event .ui-selecting { background: #ADD8E6; }
+#event .ui-selected { background: #304266; color: white; }
+#time .ui-selecting { background: #ADD8E6; }
+#time .ui-selected { background: #304266; color: white; }
+#location .ui-selecting { background: #ADD8E6; }
+#location .ui-selected { background: #304266; color: white; }
+
+.view_location{
+	background: #304266; /* Green */
+    border: white;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18px;
+    margin: -20px auto;
+}
+
+.testDiv {
+	display: block;
+}
+
+body{
+	margin:0px;
+}
+
+header{
+	/*background-color: blue;*/
+	margin: 0px;
+	width: 100%;
+	/*padding: 10px;*/
+	position: fixed;
+	color: #fff!important;
+    background-color: #304266!important;
+    padding: 0.01em 16px;
+}
+
+input {
+	/*display: none;*/
+	background: #304266; /* Green */
+    /*border: white;*/
+    color: white;
+    padding: 10px 20px;
+    /*text-align: center;*/
+    text-decoration: none;
+    display: inline-block;
+    font-size: 13px;
+    margin: 0px auto;
+    margin-top: 40px;
+}
+#selection_phase {
+	padding-left: 40px;
+
+}
+#results_container{
+	margin-top: 40px;
+	padding-left: 10px;
+
+}
+.view_location{
+	margin-bottom: 100px;
+	margin-left: 40px
+}
+.one_three{
+	margin-top: 150px;
+}
+.two_three{
+	background-color: white; /* Green */
+    border: none;
+    color: black;
+    /*padding: 0px 50px;*/
+    padding-bottom: 50px;
+    /*text-align: center;*/
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18px;
+    margin-left: 0px;
+}
+.ev_name{
+	font-size: 13px;
+
+    text-align: center;
+}
+input.input_queryier{
+	background: white; /* Green */
+    /*border: none;*/
+    color: black;
+    padding: 0px 0px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    margin: 0px 3px 1px 3px;
+    margin-top: 0px;
+	font-size: 12px;
+	width: 30px;
+	height:20px;
+}
 </style>
+
 <body>
-	<h1>Event Viewer</h1>
-	<h2>Drag and drop into band, stack and panel!</h2>
-	<input type="file" id='files' accept=".csv"></input>
-	<button id="submit">Parse</button>
-	<button id="query">QUERY</button>
+	<header>
+		<h1>Event Viewer</h1>
+	</header><!-- 
+<div class="w3-container w3-teal">
+<h1>Event Viewer</h1>
+</div> -->
+<div class="first_step">
+<div class="one_three">
+<h4>Step 1/2 : Upload a csv file with a location, event, and time attribute.</h4>
+</div>
+
+<input type="file" id='files' accept=".csv" class="choose_file"></input>
+<button id="submit" class="submits">Upload</button>
+<div id="processing"></div>
+</div>
+<div id="selection_phase" style="display:none" "overflow:hidden">
+	
+	<div class="two_three"><h4>Step 2/2 : Select events, locations, and times from the buckets below and click the query button to view all selected events.</h4></div>
 	<div id="root_event" class="buckets">
+		<div class="ev_name"><h4>Events</h4></div>
 		<div class ="fiter_new_1">
-    		<ul id="event" class ="dropzone">
-        	</ul>
-    	</div>
+	    	<ul id="event" class ="dropzone">
+	        </ul>
+	    </div>
 	</div>
 	<div id="root_location" class = "buckets">
+		<div class="ev_name"><h4>Locations</h4></div>
 		<div class ="fiter_new_1">
-    		<ul id="location" class ="dropzone">
-	        </ul>
+	    	<ul id="location" class ="dropzone">
+		    </ul>
 		</div>
 	</div>
 	<div id="root_time" class = "buckets">
+		<div class="ev_name"><h4>Times(Year)</h4></div>
 		<div class ="fiter_new_1">
-	    	<ul id="time" class ="dropzone">
-	        </ul>
-	    </div>
+		    <ul id="time" class ="dropzone">
+		    </ul>
+		</div>
 	</div>
-	<div id="drop_event" class ="buckets">    
-		<div class ="fiter_new_1">
-	    	<ul id="event_band" class ="dropzone">
-	        </ul>
-	    </div>
+	
+	<div style = "clear:both">
 	</div>
-	<div id="drop_location" class="buckets">
-		<div class ="fiter_new_1">
-	    	<ul id="location_band" class ="dropzone">
-	        </ul>
-	    </div>
-  	</div>
-	<div id="drop_time" class="buckets" >
-		<div class ="fiter_new_1">
-	    	<ul id="time_band" class ="dropzone">
-	        </ul>
-	    </div>
-<!--<link rel="stylesheet" type="text/css" href="style/RV.css" charset="utf-8" />-->
-
+	<div>
+		<button id="query" class="query">QUERY</button> 
 	</div>
+</div>
 
-	<div id="results_container" style="display:none"></div>
 
-
+<div id="results_container" style="display:none"></div>
+<button id="myBtn" class="view_location" style="display:none">View location</button>
+<div id="myModal" class="modal">
+<!-- Modal content -->
+	<div class="modal-content">
+ 		<span class="close">&times;</span>
+ 		<div id="map"></div>
+	</div>
+</div>
 </body>
 </html>
-<script>
-//var loca = [];
-// Demo invoked
-	//var loca = [];
-	$('#submit').click(function(){
 
+<script>
+
+/*Section of code where  File is parsed*/
+$("#query").click(function(){
+	console.log("Clicked query");
+})
+	$('#submit').click(function(){
+	if (!$('#files')[0].files.length)
+		{
+			alert("Please choose at least one file to parse.");
+			return enableButton();
+		}	
+
+		// Sample load CSV file
+		$("#processing").html("Processing")
 		var config = {
 		delimiter: ',',
 		header: true,
@@ -193,11 +355,7 @@
 		complete: completeFn,
 		error: errorFn
 	};
-		if (!$('#files')[0].files.length)
-		{
-			alert("Please choose at least one file to parse.");
-			return enableButton();
-		}			
+				
 		$('#files').parse({
 			config: config,
 			before: function(file, inputElem)
@@ -213,12 +371,16 @@
 			},
 			complete: function()
 			{	
+				$("#processing").html("")
 				$("#status").html("")
+				// $('html,body').animate({scrollTop: $("#selection_phase").offset().top},);
+				$("#selection_phase").show()
+				$('html,body').animate({scrollTop: $("#selection_phase").offset().top},);
+
 				end = now();
 				console.log("Done with all files");
 			}
 		})
-
 	});		
 function now()
 {
@@ -226,6 +388,14 @@ function now()
 	return typeof window.performance !== 'undefined'
 			? window.performance.now()
 			: 0;
+}
+/**
+Returns the year string from date
+@param date_str The current date
+@return String the date
+*/ 
+function getYear(date_str){
+	return date_str.slice(0,4)
 }
 function completeFn(results)
 {
@@ -263,29 +433,301 @@ function completeFn(results)
 	console.log("the event_array contains the following unique values :", event_array);
 	for (j in event_array){
 		var node = document.createElement("LI");
-		node.draggable=true;
+		var maxi  = document.createElement("input");
+		var mini  = document.createElement("input");
+		//node.draggable=true;
 		node.setAttribute("id",event_array[j]);
+		maxi.setAttribute("id","max_"+ event_array[j]);
+		mini.setAttribute("id","min_" + event_array[j]);
+		maxi.setAttribute("placeholder","max");
+		mini.setAttribute("placeholder","min");
+		maxi.setAttribute("class","input_queryier");
+		mini.setAttribute("class","input_queryier");
     	var textnode = document.createTextNode(event_array[j]);
-		node.appendChild(textnode);
-    	document.getElementById("event").appendChild(node);
+    	div_id = create_checkbox("#event", event_array[j], "event")
+    	$("#" + div_id).append(mini)
+    	$("#" + div_id).append(maxi)
+
+		//node.appendChild(textnode);
+    	//document.getElementById("event").appendChild(node);
+    	//document.getElementById(event_array[j]).appendChild(mini);
+    	//document.getElementById(event_array[j]).appendChild(maxi);
+    	//$('#maxi').val(50);
+    	//$('#mini').val(25);
+
 	}
+	create_select_all_checkbox("#event", event_array[j], "event")
+	// These methods are fired on click of a select all checkbox for a particular attribute_type
+// Upon change of the select all check box for events
+// $("#select_all_event").change(function(){
+// 		console.log("Select all event checkbox fired")
+// 		$("#event :input:checkbox").prop('checked', $(this).prop("checked"))
+// 	})
+	select_all_toggle("#select_all_event", "#event :input:checkbox")
+	
 	for (j in location_array){
 		var node = document.createElement("LI");
-		node.draggable=true;
+		//node.draggable=true;
 		node.setAttribute("id", location_array[j]);
-    	var textnode = document.createTextNode(location_array[j]);
-		node.appendChild(textnode);
-    	document.getElementById("location").appendChild(node);
+		create_checkbox("#location", location_array[j], "location")
+    	//var textnode = document.createTextNode(location_array[j]);
+		//node.appendChild(textnode);
+    	//document.getElementById("location").appendChild(node);
 	}
+	create_select_all_checkbox("#location", location_array[j], "location")
+	select_all_toggle("#select_all_location", "#location :input:checkbox")
+
 	for (j in time_array){
 		var node = document.createElement("LI");
-		node.draggable=true;
+		//node.draggable=true;
 		node.setAttribute("id",time_array[j]);
-    	var textnode = document.createTextNode(time_array[j]);
-		node.appendChild(textnode);
-    	document.getElementById("time").appendChild(node);
+	    create_checkbox("#time", time_array[j], "time")
+    	//var textnode = document.createTextNode(time_array[j]);
+		//node.appendChild(textnode);
+    	//document.getElementById("time").appendChild(node);
 	}
+	create_select_all_checkbox("#time", time_array[j], "time")
+	select_all_toggle("#select_all_time", "#time :input:checkbox")
+
+	get_event_vals(data);
+
+	}
+
+function select_all_toggle(select_all_div, attribute_div){
+	$(select_all_div).change(function(){
+		console.log("Select all event checkbox fired")
+		$(attribute_div).prop('checked', $(this).prop("checked"))
+	})
+
 }
+
+
+function get_event_vals(data){
+
+	//console.log("The data before all event values",data)
+
+	all_event_values = []
+	for (i in data){
+		ev = data[i]['event_name']
+		ev_value = data[i]['event_value']
+		// If the location exists
+		if (Object.keys(all_event_values).includes(ev)){
+			all_event_values[[ev]].push(parseInt(ev_value))
+		}else{
+			// First time we see this event
+			all_event_values[[ev]] = [parseInt(ev_value)]
+		}
+	}
+console.log(all_event_values)
+// Min and Max values for a specific event (e.g. rainfall)
+for (a in all_event_values){
+	values =all_event_values[a] // Returns an array of the values for that event
+	c =_.min(values)
+	d = _.max(values)
+	console.log("Event name: ", a)
+	console.log("Min: ", c)
+	$("#min_" + a).val(c)
+	console.log("Max: ",d)
+	$("#max_" + a).val(d)
+}
+// _.min(all_event_values['rainfall'])
+// _.max(all_event_values['rainfall'])
+}
+get_event_vals();
+
+
+/*Structure of an event and its magnitude*/
+
+function get_timeperiods_and_event_value(start_date, end_date, event_value){
+	var event_times_value = []
+	event_times_value.push(start_date)
+	event_times_value.push(end_date)
+	event_times_value.push(event_value)
+	return event_times_value
+}
+function removeA(arr) {
+    var what, a = arguments, L = a.length, ax;
+    while (L > 1 && arr.length) {
+        what = a[--L];
+        while ((ax= arr.indexOf(what)) !== -1) {
+            arr.splice(ax, 1);
+        }
+    }
+    return arr;
+}
+function get_json(array, key){
+	output = []
+	value = array[key]
+	split_keys = key.split(":")
+	output[split_keys[0]] = {
+			[split_keys[2]]:{
+				[split_keys[1]]: value
+				}
+		 	}
+	return output
+}
+
+
+
+function create_select_all_checkbox(container, attribute_value, attribute_type){
+	var div_id =  "div_all_" + attribute_type
+	var div_header = "<div id =" + div_id + ">" 
+	var div_selector = "#" + div_id
+	$('<div/>', {id: div_id}).prependTo(container)
+	$('<input/>', {type: 'checkbox', id: 'select_all_' + attribute_type, 
+		value: 'select_all_' + attribute_type,  class: attribute_type}).appendTo(div_selector)
+	$('<label/>', {'for': 'select_all_' + attribute_value, text: 'Select all ' + attribute_type}).appendTo(div_selector)
+}
+// Generates a checkbox for an event, location or year
+// and appends the checkbox to a specified location
+// @param container The html node where the created checkbox will be appended to
+// @param attribute_value The value of the event, location or year
+// @param attribute_type The type of attribute for which we are generating a checkbox
+// at the moment attributes can either be a location, event or year
+// @return div_id The id of the div containter for each unique attribute checkbox
+function create_checkbox(container, attribute_value, attribute_type) {
+
+	// Create and append checkbox to the container
+	console.log(attribute_type, ": ", attribute_value)
+	var div_id = attribute_type + "_" + remove_space_from_string(attribute_value)
+	var div_header = "<div id =" + div_id + ">"
+	$(container).append(div_header)
+	$('<input/>', {type: 'checkbox', 
+		value: attribute_value,  class: attribute_type + '_checkbox'}).appendTo("#" +div_id)
+	$('<label/>', {'for': attribute_value, text: attribute_value}).appendTo("#" +div_id)
+	$(container).append("</div>")
+	return div_id
+}
+
+function remove_space_from_string(input){
+	return input.replace(/\s/g, '')
+}
+
+
+// Filters the input data according to the event 
+// location and time that was selected by the user
+// @param locations An array of all locations provided by the user
+// @param events An array of all events selected by the user
+// @param time_periods An array of all time_periods selected by the user
+// @parama event_min_max_vals
+
+function filter_data(locations, events, time_periods) {
+	all_keys = []
+	key_vals = []
+	// Gets all possible combinations of locations events and time
+	for (l in locations){
+		for (e in events){
+			for (t in time_periods){
+				key = locations[l] + ':' + events[e] + ':' + time_periods[t]
+				//all_keys.push(key)
+				key_vals[key] = []
+			}
+		}
+	}
+	console.log("All keys: ", key_vals)
+
+	// Now Backfill
+	for (i in data){
+		loc = data[i]['location']
+		event_name = data[i]['event_name']
+		start_date = data[i]['start_date']
+		end_date = data[i]['end_date']
+		lat = data[i]['lat']
+		lng = data[i]['lng']
+		//labels=data[i]['locations']
+
+		key = loc + ':' +  event_name + ':' + getYear(start_date)
+		console.log("Working on key: ", key)
+		// If Key is in key_vals
+		if (Object.keys(key_vals).includes(key)){
+			loc_detail = {lat: parseFloat(lat), lng: parseFloat(lng)}
+
+			//map_locations.push(loc_detail)
+			//labels.push(loc);
+			// Checl if data[i]['event_value'] is in range
+			event_max = parseInt($('#max_' + event_name).val())
+			event_min = parseInt($("#min_" + event_name).val())
+			event_val = parseInt(data[i]['event_value'])
+
+			console.log("Min: ", event_min)
+			console.log("Current val: ", event_val)
+			console.log("Max: ", event_max)
+			if ((event_val >= event_min) && (event_val <= event_max)){
+ 				key_vals[[key]].push(get_timeperiods_and_event_value(data[i]['start_date'], data[i]['end_date'], data[i]['event_value']));
+					map_locations.push(loc_detail);
+					labels.push(loc);
+
+
+ 			}
+		}
+	}
+	console.log("Mapping locations :",map_locations)
+	console.log("Mapping labels :", labels)
+	console.log("After filling: ", key_vals)
+	// Creating correct JSON
+	proper_json = []
+	for  (k in key_vals){
+		proper_json.push(get_json(key_vals,k))
+	}
+	console.log("Final output: ", proper_json)
+	return proper_json
+}
+$("#query").click(function(){
+
+	var events = []
+	var locations = []
+	var timeperiods = []
+	// Add events
+	$('.event_checkbox').each(function(k,v)
+	{   
+		console.log("Keu: ", k, "Value :", v) 
+		if ($(v).prop("checked")){
+	 		events.push($(v).val()); // This is your rel value
+	 	}
+	});
+	$('.time_checkbox').each(function(k,v)
+	{
+		if ($(v).prop("checked")){
+	 		timeperiods.push($(v).val()); // This is your rel value
+	 	}
+	});
+	$('.location_checkbox').each(function(k,v)
+	{
+		if ($(v).prop("checked")) {
+	 		locations.push($(v).val()); // This is your rel value
+	 	}
+
+	});
+	console.log("events length :",events.length)
+	console.log("locations length :",locations.length)
+	console.log("timeperiods length :" ,timeperiods.length)
+	if (events.length == 0 || locations.length == 0 || timeperiods.length == 0){
+		alert("Please ensure you selected at least one event, location, and time period.");
+		return 0;
+	}
+	console.log("Events: ", events)
+	console.log("Locations: ", locations)
+	console.log("Time: ", timeperiods)
+	filtered_data = filter_data(locations, events, timeperiods)
+	console.log("Final data: ", filtered_data)
+	console.log("Final data(json) :",JSON.stringify(filtered_data))
+	console.log("location:",locations)
+	result_data=filtered_data
+	console.log(result_data);
+	$("#results_container").empty();
+
+	//console.log("the results container", $('#results_container').printElement())
+
+	r = new ResultsBuilder(result_data)
+	r.build()
+	//prepareToolBar()
+	$("#results_container").animate({width: 'toggle', left: '100%'})
+	$('html,body').animate({scrollTop: $("#results_container").offset().top - 100},);
+	$("#myBtn").show()
+	$("#results_container").show()
+	$("#results_container").resize()
+
+})
 // This gets the unique events, location
 // and year form the data 
 // @param results An array representing the passed in array
@@ -299,31 +741,70 @@ function errorFn(err, file)
 	console.log("ERROR:", err, file);
 	enableButton();
 }
-$("#query").click(function(){
-	console.log("I just clicked on the query button");
-		 	
-			$("#results_container").children(":not(#tb_container)").remove();
-			
-			//result_data =[{"[Gulf of Maine].[Coastal].[Western Maine Shelf].[B].[1-20]":{"[TimeFilter].[2001]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2001-10-09 07:55:12.0","2001-10-11 07:55:12.0","0.376"],["2001-11-03 19:55:12.0","2001-11-04 03:07:12.0","0.008"],["2001-11-06 06:00:00.0","2001-11-25 09:07:12.0","0.542"],["2001-11-29 11:02:24.0","2001-12-14 18:57:36.0","0.348"],["2001-12-14 19:55:12.0","2001-12-18 04:04:48.0","-9999.0"],["2001-12-18 05:02:24.0","2001-12-24 21:07:12.0","0.419"],["2001-12-25 10:04:48.0","2002-01-22 07:55:12.0","0.352"]]}}},{"[Gulf of Maine].[Coastal].[Western Maine Shelf].[B].[1-20]":{"[TimeFilter].[2002]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2002-01-22 13:55:12.0","2002-02-17 00:57:36.0","0.262"],["2002-02-17 11:02:24.0","2002-02-22 01:55:12.0","0.193"],["2002-02-22 12:57:36.0","2002-03-14 18:57:36.0","0.195"],["2002-03-15 23:02:24.0","2002-03-23 04:04:48.0","0.213"],["2002-03-24 06:00:00.0","2002-03-26 01:55:12.0","0.167"],["2002-03-26 15:07:12.0","2002-03-27 15:07:12.0","0.132"],["2002-03-27 16:04:48.0","2002-06-17 12:00:00.0","-9999.0"],["2002-10-01 17:02:24.0","2002-10-08 21:07:12.0","-9999.0"],["2002-10-15 21:07:12.0","2003-03-23 17:02:24.0","0.802"]]}}},{"[Gulf of Maine].[Coastal].[Western Maine Shelf].[B].[1-20]":{"[TimeFilter].[2003]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2003-03-31 18:57:36.0","2003-04-01 11:02:24.0","0.414"],["2003-04-13 00:57:36.0","2003-04-13 18:57:36.0","0.303"],["2003-04-14 23:02:24.0","2003-04-15 06:57:36.0","0.228"],["2003-04-18 05:02:24.0","2003-04-18 11:02:24.0","0.131"],["2003-04-28 00:00:00.0","2003-04-28 17:02:24.0","0.893"],["2003-05-17 00:00:00.0","2003-05-18 10:04:48.0","0.515"],["2003-05-25 09:07:12.0","2003-05-26 01:55:12.0","0.464"],["2003-10-25 06:57:36.0","2003-10-25 21:07:12.0","0.086"],["2003-11-15 00:00:00.0","2003-11-16 19:55:12.0","0.481"],["2003-11-21 21:07:12.0","2003-11-22 05:02:24.0","0.101"],["2003-11-26 06:57:36.0","2003-11-27 12:57:36.0","0.337"],["2003-11-29 23:02:24.0","2003-12-01 18:00:00.0","0.323"],["2003-12-02 01:55:12.0","2003-12-24 15:07:12.0","0.417"],["2003-12-26 18:00:00.0","2003-12-28 19:55:12.0","0.264"],["2003-12-29 04:04:48.0","2004-01-04 13:55:12.0","0.253"]]}}},{"[Gulf of Maine].[Coastal].[Western Maine Shelf].[B].[1-20]":{"[TimeFilter].[2004]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2004-01-05 10:04:48.0","2004-01-07 18:57:36.0","0.345"],["2004-01-08 18:00:00.0","2004-02-28 23:02:24.0","0.425"],["2004-02-29 13:55:12.0","2004-03-01 04:04:48.0","0.058"],["2004-03-09 03:07:12.0","2004-03-10 12:00:00.0","0.324"],["2004-03-12 00:00:00.0","2004-03-12 18:57:36.0","0.229"],["2004-03-14 04:04:48.0","2004-03-15 15:07:12.0","0.105"],["2004-03-17 06:57:36.0","2004-03-21 19:55:12.0","0.195"],["2004-03-22 18:00:00.0","2004-03-24 18:00:00.0","0.087"],["2004-04-02 04:04:48.0","2004-04-05 03:07:12.0","0.289"],["2004-04-13 19:55:12.0","2004-04-14 09:07:12.0","0.073"],["2004-04-16 10:04:48.0","2004-04-16 19:55:12.0","0.092"],["2004-10-13 01:55:12.0","2004-10-13 13:55:12.0","0.309"],["2004-10-23 00:57:36.0","2004-10-27 12:00:00.0","0.447"],["2004-10-30 04:04:48.0","2004-10-30 18:57:36.0","0.472"],["2004-11-04 07:55:12.0","2004-12-12 06:00:00.0","0.584"],["2004-12-18 05:02:24.0","2005-01-05 11:02:24.0","0.629"]]}}},{"[Gulf of Maine].[Coastal].[Western Maine Shelf].[B].[1-20]":{"[Time].[Month].\u0026[April]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[]}}}]
-			result_data=[{"Gulf of Maine":{"[TimeFilter].[2001]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2001-10-09 07:55:12.0","2001-10-11 07:55:12.0","0.376"],["2001-11-03 19:55:12.0","2001-11-04 03:07:12.0","0.008"],["2001-11-06 06:00:00.0","2001-11-25 09:07:12.0","0.542"],["2001-11-29 11:02:24.0","2001-12-14 18:57:36.0","0.348"],["2001-12-14 19:55:12.0","2001-12-18 04:04:48.0","-9999.0"],["2001-12-18 05:02:24.0","2001-12-24 21:07:12.0","0.419"],["2001-12-25 10:04:48.0","2002-01-22 07:55:12.0","0.352"]]}}},{"Gulf of Maine":{"[TimeFilter].[2002]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2002-01-22 13:55:12.0","2002-02-17 00:57:36.0","0.262"],["2002-02-17 11:02:24.0","2002-02-22 01:55:12.0","0.193"],["2002-02-22 12:57:36.0","2002-03-14 18:57:36.0","0.195"],["2002-03-15 23:02:24.0","2002-03-23 04:04:48.0","0.213"],["2002-03-24 06:00:00.0","2002-03-26 01:55:12.0","0.167"],["2002-03-26 15:07:12.0","2002-03-27 15:07:12.0","0.132"],["2002-03-27 16:04:48.0","2002-06-17 12:00:00.0","-9999.0"],["2002-10-01 17:02:24.0","2002-10-08 21:07:12.0","-9999.0"],["2002-10-15 21:07:12.0","2003-03-23 17:02:24.0","0.802"]]}}},{"Gulf of Maine":{"[TimeFilter].[2003]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2003-03-31 18:57:36.0","2003-04-01 11:02:24.0","0.414"],["2003-04-13 00:57:36.0","2003-04-13 18:57:36.0","0.303"],["2003-04-14 23:02:24.0","2003-04-15 06:57:36.0","0.228"],["2003-04-18 05:02:24.0","2003-04-18 11:02:24.0","0.131"],["2003-04-28 00:00:00.0","2003-04-28 17:02:24.0","0.893"],["2003-05-17 00:00:00.0","2003-05-18 10:04:48.0","0.515"],["2003-05-25 09:07:12.0","2003-05-26 01:55:12.0","0.464"],["2003-10-25 06:57:36.0","2003-10-25 21:07:12.0","0.086"],["2003-11-15 00:00:00.0","2003-11-16 19:55:12.0","0.481"],["2003-11-21 21:07:12.0","2003-11-22 05:02:24.0","0.101"],["2003-11-26 06:57:36.0","2003-11-27 12:57:36.0","0.337"],["2003-11-29 23:02:24.0","2003-12-01 18:00:00.0","0.323"],["2003-12-02 01:55:12.0","2003-12-24 15:07:12.0","0.417"],["2003-12-26 18:00:00.0","2003-12-28 19:55:12.0","0.264"],["2003-12-29 04:04:48.0","2004-01-04 13:55:12.0","0.253"]]}}},{"Gulf of Maine":{"[TimeFilter].[2004]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[["2004-01-05 10:04:48.0","2004-01-07 18:57:36.0","0.345"],["2004-01-08 18:00:00.0","2004-02-28 23:02:24.0","0.425"],["2004-02-29 13:55:12.0","2004-03-01 04:04:48.0","0.058"],["2004-03-09 03:07:12.0","2004-03-10 12:00:00.0","0.324"],["2004-03-12 00:00:00.0","2004-03-12 18:57:36.0","0.229"],["2004-03-14 04:04:48.0","2004-03-15 15:07:12.0","0.105"],["2004-03-17 06:57:36.0","2004-03-21 19:55:12.0","0.195"],["2004-03-22 18:00:00.0","2004-03-24 18:00:00.0","0.087"],["2004-04-02 04:04:48.0","2004-04-05 03:07:12.0","0.289"],["2004-04-13 19:55:12.0","2004-04-14 09:07:12.0","0.073"],["2004-04-16 10:04:48.0","2004-04-16 19:55:12.0","0.092"],["2004-10-13 01:55:12.0","2004-10-13 13:55:12.0","0.309"],["2004-10-23 00:57:36.0","2004-10-27 12:00:00.0","0.447"],["2004-10-30 04:04:48.0","2004-10-30 18:57:36.0","0.472"],["2004-11-04 07:55:12.0","2004-12-12 06:00:00.0","0.584"],["2004-12-18 05:02:24.0","2005-01-05 11:02:24.0","0.629"]]}}},{"Gulf of Maine":{"[Time].[Month].\u0026[April]":{"[Ocean].[Sigma-Tdensity].[Threshold].[Mixed125]":[]}}}]
-			r = new ResultsBuilder(result_data)
-					r.build()
-	
-			
-			//$("#query_container").animate({width: 'toggle'})
-			$("#results_container").animate({width: 'toggle', left: '100%'})
 
-			$("#results_container").show()	
-			//$("#continue").detach().appendTo('#tb_container')
-			//$("#continue").slideDown();
-	
-			//var r = new ResultsBuilder(sample);
-			//r.build()
-})
+/*Section of code where mapping functionality is constructed*/
+
+//Quick fuction to return latitude and longitude value.
+function pass(x,y){
+	return {lat: x, lng: y};
+} 
+
+ function initMap() {
+    var uluru = map_locations[0];
+    var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 1,
+    center: uluru
+});
+// Create an array of alphabetical characters used to label the markers.
+ //var labels = []
+//var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+	var markers = map_locations.map(function(location, i) {
+	return new google.maps.Marker({
+	    position: location,
+	    label: labels[i]
+
+	        });
+	    });
+
+	//google.maps.Marker.set()
+// Add a marker clusterer to manage the markers.
+    var markerCluster = new MarkerClusterer(map, markers,
+        {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+    }
+</script>
+<script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6ucwI3utdT6UnS1tQgOo5cTJZNtdl-9Q&callback=initMap"></script>
+<script>
+
+/* Section of code where modal for viewing map is displayed*/
+// Get the modal
+var modal = document.getElementById('myModal');
+// Get the button that opens the modal
+var btn = document.getElementById("myBtn");
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+// When the user clicks the button, open the modal 
+btn.onclick = function() {
+    modal.style.display = "block";
+    google.maps.event.trigger(map, "resize");
+    initMap(); 
+}
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+}
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
 </script>
 <script src="script/bootstrap.min.js"></script>
-	    <script src="script/bootstrap.js"></script>
-		<script src="script/d3.v3.js"></script>
-        <script src="script/RV_Classes.js"></script>
-        <script src="script/RVtimebar.js"></script>
-        <script src="script/RV.js"></script>
+<script src="script/bootstrap.js"></script>
+<script src="script/d3.v3.js"></script>
+<script src="script/RV_Classes.js"></script>
+<script src="script/RVtimebar.js"></script>
+<script src="script/RV.js"></script>
+

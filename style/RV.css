@@ -148,7 +148,7 @@ body{
 	color: #000 !important;
 }
 .datum{
-	fill:teal;
+	fill:#333;
 	cursor: help;
 }
 .datum:hover{

@@ -435,17 +435,23 @@ function completeFn(results)
 		var node = document.createElement("LI");
 		var maxi  = document.createElement("input");
 		var mini  = document.createElement("input");
+		var unit  = document.createElement("label")
 		//node.draggable=true;
 		node.setAttribute("id",event_array[j]);
 		maxi.setAttribute("id","max_"+ event_array[j]);
 		mini.setAttribute("id","min_" + event_array[j]);
+		unit.setAttribute("id","unit_"+ event_array[j]);
 		maxi.setAttribute("placeholder","max");
 		mini.setAttribute("placeholder","min");
+
 		maxi.setAttribute("class","input_queryier");
 		mini.setAttribute("class","input_queryier");
     	var textnode = document.createTextNode(event_array[j]);
     	div_id = create_checkbox("#event", event_array[j], "event")
+    	$("#" + div_id).append(" (mm) ")
+    	//$("#" + div_id).append("min: ")
     	$("#" + div_id).append(mini)
+    	//$("#" + div_id).append("max: ")
     	$("#" + div_id).append(maxi)
 
 		//node.appendChild(textnode);
@@ -490,6 +496,7 @@ function completeFn(results)
 	select_all_toggle("#select_all_time", "#time :input:checkbox")
 
 	get_event_vals(data);
+	get_event_units(data);
 
 	}
 
@@ -510,7 +517,7 @@ function get_event_vals(data){
 	for (i in data){
 		ev = data[i]['event_name']
 		ev_value = data[i]['event_value']
-		// If the location exists
+		// If the value exists
 		if (Object.keys(all_event_values).includes(ev)){
 			all_event_values[[ev]].push(parseInt(ev_value))
 		}else{
@@ -533,9 +540,33 @@ for (a in all_event_values){
 // _.min(all_event_values['rainfall'])
 // _.max(all_event_values['rainfall'])
 }
-get_event_vals();
+//get_event_vals
 
+function get_event_units(data){
+	all_event=[]
+	for(i in data){
+		event_names=data[i]['event_name']
+		event_units=data[i]['event_unit']
 
+		if (Object.keys(all_event).includes(event_names)){
+			all_event[[event_names]].push(event_units)
+		}else{
+			all_event[[event_names]] = [event_units]
+		}
+
+	}
+	console.log("all events and their units:",all_event)
+
+for (a in all_event){
+	values = all_event[a]
+	b=_.unique(values)
+	console.log("Event name: ",a)
+	console.log("Unit: ",b)
+	$("#unit_" + a).val(b)
+}
+}
+
+//get_event_units
 /*Structure of an event and its magnitude*/
 
 function get_timeperiods_and_event_value(start_date, end_date, event_value){
@@ -673,6 +704,7 @@ function filter_data(locations, events, time_periods) {
 	return proper_json
 }
 $("#query").click(function(){
+	
 
 	var events = []
 	var locations = []
@@ -714,9 +746,10 @@ $("#query").click(function(){
 	console.log("location:",locations)
 	result_data=filtered_data
 	console.log(result_data);
-	$("#results_container").empty();
+	
 
 	//console.log("the results container", $('#results_container').printElement())
+	$(".panelrv").remove();
 
 	r = new ResultsBuilder(result_data)
 	r.build()

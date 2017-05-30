@@ -30,7 +30,7 @@ var labels=[]
    float: left;
    margin: 10px;
    padding: 10px;
-   max-width: 300px;
+   max-width: 500px;
    height: 260px;
    border: 1px solid black;
 }
@@ -46,7 +46,7 @@ var labels=[]
    float: left;
    margin: 10px;
    padding: 10px;
-   max-width: 300px;
+   max-width: 500px;
    height: 220px;
    overflow: auto;
    background: #DCDCDC;
@@ -56,7 +56,7 @@ var labels=[]
  float: left;
    margin: 10px;
    padding: 10px;
-   max-width: 300px;
+   max-width: 500px;
    height: 140px;
    overflow: auto;
    background: #DCDCDC;
@@ -188,6 +188,10 @@ var labels=[]
 	display: block;
 }
 
+.range_label{
+	margin-left: 10px;
+}
+
 body{
 	margin:0px;
 }
@@ -223,6 +227,7 @@ input {
 #results_container{
 	margin-top: 40px;
 	padding-left: 10px;
+	display: block !important;
 
 }
 .view_location{
@@ -315,7 +320,7 @@ input.input_queryier{
 </div>
 
 
-<div id="results_container" style="display:none"></div>
+<div id="results_container"></div>
 <button id="myBtn" class="view_location" style="display:none">View location</button>
 <div id="myModal" class="modal">
 <!-- Modal content -->
@@ -328,8 +333,10 @@ input.input_queryier{
 </html>
 
 <script>
-
+EVENT_UNIT = [] // A dictionary mapping events to units
 /*Section of code where  File is parsed*/
+EVENT_LOCATION_MAP= [] // A giant hashmap of event ==> location ==> time
+
 $("#query").click(function(){
 	console.log("Clicked query");
 })
@@ -423,19 +430,44 @@ function completeFn(results)
 		time_array.push(output_2);
 		time_array.push(output_3);
 		output_4= data[i]['event_name'];
-		event_array.push(output_4);
-	}
+		event_array.push(output_4)
+		var loc = data[i]['location']
+		// // Build EVENT_LOCATION_MAP
+		// if (Object.keys(EVENT_LOCATION_MAP).includes(data[i]['event_name']))  {
+
+
+		// 	event_data = EVENT_LOCATION_MAP[data[i]['event_name']]
+		// 	// Now check years
+		// 	if (Object.keys(event_data).includes(data[i]['location'])){
+		// 		location_data = event_data[data[i]['location']]
+		// 		// If we haven't seen this year before, add it to the array
+		// 		if (!location_data.includes(data[i]['start_date'])){
+		// 			location_data.append(data[i]['start_date'])
+		// 		}
+		// 	} else{
+		// 		event_data[data[i]['location']] = [data[i]['start_date']]
+		// 	}
+		// } else { // We just start from the scratchh
+		// 	var location = []
+		// 	EVENT_LOCATION_MAP[data[i]['event_name']] = {
+		// 		location[[loc]] = [data[i]['start_date']]
+				
+		// 	}
+		 }
+	
 	location_array =_.unique(location_array);
 	time_array = _.unique(time_array);
 	event_array = _.unique(event_array);
 	console.log("the location_array contains the following unique values :", location_array);
 	console.log("the time_array contains the following unique values :", time_array);
 	console.log("the event_array contains the following unique values :", event_array);
+
+	EVENT_UNIT = get_event_units(data);
 	for (j in event_array){
 		var node = document.createElement("LI");
 		var maxi  = document.createElement("input");
 		var mini  = document.createElement("input");
-		var unit  = document.createElement("label")
+		var unit  = document.createElement("LABEL");
 		//node.draggable=true;
 		node.setAttribute("id",event_array[j]);
 		maxi.setAttribute("id","max_"+ event_array[j]);
@@ -443,25 +475,22 @@ function completeFn(results)
 		unit.setAttribute("id","unit_"+ event_array[j]);
 		maxi.setAttribute("placeholder","max");
 		mini.setAttribute("placeholder","min");
+		//unit.setAttribute("for","unit_"+ event_array[j]);
 
 		maxi.setAttribute("class","input_queryier");
 		mini.setAttribute("class","input_queryier");
     	var textnode = document.createTextNode(event_array[j]);
-    	div_id = create_checkbox("#event", event_array[j], "event")
-    	$("#" + div_id).append(" (mm) ")
-    	//$("#" + div_id).append("min: ")
+    	div_id = create_checkbox("#event", event_array[j], "event",false)
+    	// $("#" + div_id).append("(mm)   ")
+    	$("#" + div_id).append("<span class='range_label'>min:</span>")
     	$("#" + div_id).append(mini)
-    	//$("#" + div_id).append("max: ")
+    	$("#" + div_id).append("<span class='range_label'>max:</span>")
     	$("#" + div_id).append(maxi)
 
-		//node.appendChild(textnode);
-    	//document.getElementById("event").appendChild(node);
-    	//document.getElementById(event_array[j]).appendChild(mini);
-    	//document.getElementById(event_array[j]).appendChild(maxi);
-    	//$('#maxi').val(50);
-    	//$('#mini').val(25);
 
 	}
+	
+	console.log("Event_units_is :",EVENT_UNIT);
 	create_select_all_checkbox("#event", event_array[j], "event")
 	// These methods are fired on click of a select all checkbox for a particular attribute_type
 // Upon change of the select all check box for events
@@ -475,7 +504,7 @@ function completeFn(results)
 		var node = document.createElement("LI");
 		//node.draggable=true;
 		node.setAttribute("id", location_array[j]);
-		create_checkbox("#location", location_array[j], "location")
+		create_checkbox("#location", location_array[j], "location", false)
     	//var textnode = document.createTextNode(location_array[j]);
 		//node.appendChild(textnode);
     	//document.getElementById("location").appendChild(node);
@@ -487,16 +516,21 @@ function completeFn(results)
 		var node = document.createElement("LI");
 		//node.draggable=true;
 		node.setAttribute("id",time_array[j]);
-	    create_checkbox("#time", time_array[j], "time")
+	    create_checkbox("#time", time_array[j], "time", false)
     	//var textnode = document.createTextNode(time_array[j]);
 		//node.appendChild(textnode);
     	//document.getElementById("time").appendChild(node);
 	}
 	create_select_all_checkbox("#time", time_array[j], "time")
 	select_all_toggle("#select_all_time", "#time :input:checkbox")
+	// $("#select_all_time").prop("disabled", true);
+	// $("#time :input:checkbox").prop("disabled", true);
+	// $("#select_all_location").prop("disabled", true);
+	// $("#location :input:checkbox").prop("disabled", true);
 
-	get_event_vals(data);
-	get_event_units(data);
+
+
+	get_event_vals(data); 
 
 	}
 
@@ -542,31 +576,23 @@ for (a in all_event_values){
 }
 //get_event_vals
 
+
+//get_event_units
 function get_event_units(data){
 	all_event=[]
 	for(i in data){
 		event_names=data[i]['event_name']
 		event_units=data[i]['event_unit']
-
-		if (Object.keys(all_event).includes(event_names)){
-			all_event[[event_names]].push(event_units)
-		}else{
-			all_event[[event_names]] = [event_units]
+		all_event[[event_names]] = event_units
 		}
 
-	}
-	console.log("all events and their units:",all_event)
-
-for (a in all_event){
-	values = all_event[a]
-	b=_.unique(values)
-	console.log("Event name: ",a)
-	console.log("Unit: ",b)
-	$("#unit_" + a).val(b)
-}
+	
+	return all_event
 }
 
-//get_event_units
+
+
+
 /*Structure of an event and its magnitude*/
 
 function get_timeperiods_and_event_value(start_date, end_date, event_value){
@@ -614,18 +640,29 @@ function create_select_all_checkbox(container, attribute_value, attribute_type){
 // @param container The html node where the created checkbox will be appended to
 // @param attribute_value The value of the event, location or year
 // @param attribute_type The type of attribute for which we are generating a checkbox
-// at the moment attributes can either be a location, event or year
+// @param display_checkbox Is the checkbox enableddefault False
+// at the moment attributes can either be a location, event or yea
 // @return div_id The id of the div containter for each unique attribute checkbox
-function create_checkbox(container, attribute_value, attribute_type) {
+function create_checkbox(container, attribute_value, attribute_type, display_checkbox) {
 
+	checkbox_label = ""
+	if (attribute_type == "event"){
+		checkbox_label = attribute_value + " (" + EVENT_UNIT[[attribute_value]] + ")"
+	} else{
+		checkbox_label = attribute_value
+	}
+
+	console.log("Events + unit: ", EVENT_UNIT[[attribute_value]])
 	// Create and append checkbox to the container
 	console.log(attribute_type, ": ", attribute_value)
 	var div_id = attribute_type + "_" + remove_space_from_string(attribute_value)
 	var div_header = "<div id =" + div_id + ">"
 	$(container).append(div_header)
 	$('<input/>', {type: 'checkbox', 
-		value: attribute_value,  class: attribute_type + '_checkbox'}).appendTo("#" +div_id)
-	$('<label/>', {'for': attribute_value, text: attribute_value}).appendTo("#" +div_id)
+		value: attribute_value,  
+		class: attribute_type + '_checkbox',
+		disabled: display_checkbox}).appendTo("#" +div_id)
+	$('<label/>', {'for': attribute_value, text: checkbox_label}).appendTo("#" +div_id)
 	$(container).append("</div>")
 	return div_id
 }
@@ -759,8 +796,19 @@ $("#query").click(function(){
 	$("#myBtn").show()
 	$("#results_container").show()
 	$("#results_container").resize()
+	show_toolbars()
 
 })
+
+
+function show_toolbars(){
+	$("#tb_container").show()
+	$("#toolbar_container").show()
+}
+function hide_toolbars(){
+	$("#tb_container").hide()
+	$("#toolbar_container").hide()
+}
 // This gets the unique events, location
 // and year form the data 
 // @param results An array representing the passed in array
@@ -840,4 +888,8 @@ window.onclick = function(event) {
 <script src="script/RV_Classes.js"></script>
 <script src="script/RVtimebar.js"></script>
 <script src="script/RV.js"></script>
+
+<script>
+hide_toolbars();
+</script>
 

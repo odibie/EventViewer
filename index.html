@@ -553,10 +553,10 @@ function get_event_vals(data){
 		ev_value = data[i]['event_value']
 		// If the value exists
 		if (Object.keys(all_event_values).includes(ev)){
-			all_event_values[[ev]].push(parseInt(ev_value))
+			all_event_values[[ev]].push(parseFloat(ev_value))
 		}else{
 			// First time we see this event
-			all_event_values[[ev]] = [parseInt(ev_value)]
+			all_event_values[[ev]] = [parseFloat(ev_value)]
 		}
 	}
 console.log(all_event_values)

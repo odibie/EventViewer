@@ -1,10 +1,8 @@
-start_date,end_date,location,lat,lon ,event_name,event_value,event_description
-5/22/12,5/22/12,Orono,44.8831,-68.6719,rainfall,2.5,rainfall> 2 inches
-5/22/13,5/22/13,Orono,44.8831,-68.6719,col_score,33,fecal coliform > 31
-5/22/17,5/22/17,Orono,44.8831,-68.6719,rainfall,2.5,rainfall> 2 inches
-5/22/18,5/22/18,Bangor,44.8831,-68.6719,col_score,33,fecal coliform > 31
-5/22/19,5/22/19,Old Town,44.8831,-68.6719,rainfall,2.5,rainfall> 2 inches
-5/22/20,5/22/20,Portland,44.8831,-68.6719,col_score,33,fecal coliform > 31
-5/22/30,5/22/30,Bath,44.8831,-68.6719,extra test event,2.5,test event
-5/23/40,5/23/41,Lasgidi,44.8831,-68.6719,extra test event,33,test event
-7/22/12,9/22/12,Orono,44.8831,-68.6719,rainfall,12.5,rainfall> 12 inches
+start_date,end_date,location,lat,lng,event_name,event_value,event_unit
+2012-05-22 12:00:00,2012-08-22 00:00:00,Orono,44.8831,-68.6719,rainfall,90,mm
+2012-05-22 00:00:00,2012-08-22 00:00:00,Orono,44.900597,-68.667359,col_score,33,count
+2013-05-22 00:00:00,2013-07-22 00:00:00,Orono,44.908185,-68.676062,rainfall,29,mm
+2013-05-22 00:00:00,2013-07-22 00:00:00,Orono,44.90315,-68.663067,col_score,1,count
+2014-05-22 00:00:00,2014-05-29 00:00:00,Old Town,44.8831,-68.6719,rainfall,2,mm
+2014-05-22 00:00:00,2014-07-22 00:00:00,Bangor,44.8012,68.7778,col_score,200,count
+2012-01-22 12:00:00,2012-03-22 12:00:00,Old Town,44.8831,-68.6719,rainfall,22,mm

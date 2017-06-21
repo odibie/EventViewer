@@ -461,6 +461,9 @@ function completeFn(results)
 	location_array =_.unique(location_array);
 	time_array = _.unique(time_array);
 	event_array = _.unique(event_array);
+	location_array = location_array.sort();
+	time_array = time_array.sort();
+	event_array = event_array.sort();
 	console.log("the location_array contains the following unique values :", location_array);
 	console.log("the time_array contains the following unique values :", time_array);
 	console.log("the event_array contains the following unique values :", event_array);
